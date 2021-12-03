@@ -1,0 +1,52 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+
+variables:
+  buildConfiguration: 'Release'
+  proyecto: 'WebAPIAutores.csproj'
+
+
+steps:
+- script: echo Hello, world!
+  displayName: 'Run a one-line script'
+
+- script: |
+    echo Add other tasks to build, test, and deploy your project.
+    echo See https://aka.ms/yaml
+  displayName: 'Run a multi-line script'
+- task: UseDotNet@2
+  displayName: 'Instalando Preview ASP.NET Core 6'
+  inputs:
+    packageType: 'sdk'
+    version: '6.0.100-preview.4.21255.9'
+    includePreviewVersions: true
+- script: dotnet build --configuration $(buildConfiguration)
+  displayName: 'dotnet build $(buildConfiguration)'
+- task: CmdLine@2
+  displayName: 'Installing EF Core CLI'
+  inputs:
+    script: 'dotnet tool install --global dotnet-ef'
+- task: CmdLine@2
+  displayName: 'Generating DB script'
+  inputs:
+    script: 'dotnet ef migrations script -i -o $(Build.ArtifactStagingDirectory)\migrate.sql --project $(proyecto)'
+- task: DotNetCoreCLI@2
+  displayName: 'Publishing App...'
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    projects: $(proyecto)
+    arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory) --runtime win-x86 --self-contained'
+    zipAfterPublish: false
+    modifyOutputPath: false
+- task: PublishBuildArtifacts@1
+  displayName: 'Publicando los artefactos'
