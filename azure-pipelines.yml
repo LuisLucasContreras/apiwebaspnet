@@ -6,20 +6,11 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
-
 variables:
   buildConfiguration: 'Release'
   proyecto: 'WebAPIAutores.csproj'
 
-
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
-
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
 - task: UseDotNet@2
   displayName: 'Instalando Preview ASP.NET Core 6'
   inputs:
@@ -42,7 +33,7 @@ steps:
     command: 'publish'
     publishWebProjects: false
     projects: $(proyecto)
-    arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory) --runtime win-x86 --self-contained'
+    arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory) --runtime win-x64 --self-contained'
     zipAfterPublish: false
     modifyOutputPath: false
 - task: PublishBuildArtifacts@1
